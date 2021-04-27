@@ -1,27 +1,38 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Reactive;
 using System.Text;
 using AI.Models;
+using AI.GameEngine;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using ReactiveUI;
 
 namespace AI.ViewModels
 {
-    public class MankalaViewModel : ViewModelBase
+    public class MankalaViewModel : ReactiveObject
     {
-        public int[][] State { get; set; }
-        public ReactiveCommand<string, Unit> OnClickCommand { get; }
 
-        public MankalaViewModel()
+        private State _state;
+
+        public State State
         {
-            State = new int[6][];
-            Array.Fill(State, new[] { 3, 3 });
-            OnClickCommand = ReactiveCommand.Create<string,Unit>(buttonName => OnButtonClick(buttonName));
+            get => _state;
+            set => _state = this.RaiseAndSetIfChanged(ref _state, value);
         }
 
-        
+        public ReactiveCommand<string, Unit> OnClickCommand { get; }
+        public MankalaViewModel()
+        {
+            State = new State
+            {
+                HolesState = new int[6].Select(_ => new[] { 3, 3 }.ToImmutableArray()).ToImmutableArray(),
+                Wells = new[]{0,0}.ToImmutableArray()
+            };
+            OnClickCommand = ReactiveCommand.Create<string,Unit>(OnButtonClick);
+        }
 
         public Unit OnButtonClick(string buttonName)
         {
@@ -41,6 +52,19 @@ namespace AI.ViewModels
                 "B12" => (5, 1),
                 _ => throw new NotImplementedException()
             };
+
+            var move = new Move
+            {
+                OldState = State,
+                Selection = choice
+            };
+
+            var isValid = GameEngine.GameEngine.IsValidMove(move);
+
+            if (isValid)
+                State = GameEngine.GameEngine.MakeMove(move);
+
+
             return new Unit();
         }
     }
