@@ -14,6 +14,16 @@ namespace AI.GameEngine
     {
         public static int HolesInRow { get; set; } = 6;
 
+
+        public static bool IsValidMove(State state, (int,int) selection)
+        {
+            var (x, y) = selection;
+            var stonesLeft = state.HolesState[x][y];
+            var nonEmpty = stonesLeft > 0;
+
+            return nonEmpty;
+        }
+
         public static bool IsValidMove(Move move)
         {
             if (move.OldState.GameOver)

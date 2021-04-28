@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
+using AI.GameEngine;
 using AI.Models;
 using ReactiveUI;
 
@@ -13,6 +15,8 @@ namespace AI.ViewModels
 
         private State _state;
         private int _nInitialStones = 4;
+        private int nextBotMove = 0;
+
         public string PlayerMoveString => $"Kolej gracza {_state.Player + 1}";
         public ReactiveCommand<string, Unit> OnClickCommand { get; }
         public State State
@@ -41,6 +45,18 @@ namespace AI.ViewModels
 
         public Unit OnButtonClick(string buttonName)
         {
+            if (State.GameOver)
+            {
+                var sum = 0;
+                for (var col = 0; col < 6; col++)
+                {
+                    sum += State.HolesState[col][0];
+                    sum += State.HolesState[col][1];
+                }
+
+                return new Unit();
+
+            }
             var choice = buttonName switch
             {
                 "B1" => (0, 0),
@@ -58,6 +74,14 @@ namespace AI.ViewModels
                 _ => throw new NotImplementedException()
             };
 
+            if (State.Player == 0)
+            {
+                nextBotMove = MinMax.BuildTree(State, 4);
+                Debugger.Log(3, "Recursion", nextBotMove.ToString());
+                if (nextBotMove == -1)
+                    State.GameOver = true;
+            }
+
             var move = new Move
             {
                 OldState = State,
@@ -70,6 +94,15 @@ namespace AI.ViewModels
                 State = GameEngine.GameEngine.MakeMove(move);
             this.RaisePropertyChanged("PlayerMoveString");
             RefreshButtonState();
+
+            move = new Move
+            {
+                OldState = State,
+                Selection = (nextBotMove,1)
+            };
+
+            State = GameEngine.GameEngine.MakeMove(move);
+            Debugger.Log(3, "Bot", "Bot Moved");
             return new Unit();
         }
     }
