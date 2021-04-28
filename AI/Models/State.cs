@@ -12,5 +12,6 @@ namespace AI.Models
         public ImmutableArray<ImmutableArray<int>> HolesState { get; set; }
         public ImmutableArray<int> Wells { get; set; }
         public int Player { get; set; }
+        public bool GameOver { get; set; }
     }
 }

@@ -5,14 +5,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AI.Models;
+using Avalonia.Controls.ApplicationLifetimes;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AI.GameEngine
 {
     class GameEngine
     {
+        public static int HolesInRow { get; set; } = 6;
+
         public static bool IsValidMove(Move move)
         {
+            if (move.OldState.GameOver)
+                return false;
             var (x, y) = move.Selection;
             var stonesLeft = move.OldState.HolesState[x][y];
             var nonEmpty = stonesLeft > 0;
@@ -69,11 +74,32 @@ namespace AI.GameEngine
                 }
             }
 
+            var gameOver = false;
+            var sum1 = 0;
+            var sum2 = 0;
+            for (var col = 0; col < HolesInRow; col++)
+            {
+                sum1 += resIntArrMut[col][0];
+                sum2 += resIntArrMut[col][1];
+            }
+
+            if (sum1 == 0)
+            {
+                wellsMut[0] = sum2;
+                gameOver = true;
+            }
+            else if (sum2 == 0)
+            {
+                wellsMut[1] = sum1;
+                gameOver = true;
+            }
+
             return new State
             {
                 HolesState = resIntArrMut.Select(s => s.ToImmutableArray()).ToImmutableArray(),
                 Wells = wellsMut.ToImmutableArray(),
-                Player = anotherMove ? move.OldState.Player : 1-move.OldState.Player
+                Player = anotherMove ? move.OldState.Player : 1-move.OldState.Player,
+                GameOver = gameOver
             };
         }
     }

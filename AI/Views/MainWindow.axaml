@@ -36,7 +36,7 @@
         <Button Name="B11" Command="{Binding OnClickCommand}" CommandParameter="B11" Grid.Row="1" Grid.Column="5" Content="{Binding State.HolesState[4][1], Mode=OneWay}" />
         <Button Name="B12" Command="{Binding OnClickCommand}" CommandParameter="B12" Grid.Row="1" Grid.Column="6" Content="{Binding State.HolesState[5][1], Mode=OneWay}" />
         <TextBlock HorizontalAlignment="Center" TextAlignment="Center" Grid.Row="0" Grid.Column="7" Grid.RowSpan="2" Text="{Binding State.Wells[1]}"></TextBlock>
-        <TextBlock Text="{Binding PlayerMoveString}"></TextBlock>
+        <TextBlock Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" Text="{Binding PlayerMoveString}"></TextBlock>
     </Grid>
 
 </Window>
