@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AI.Models;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AI.GameEngine
 {
@@ -29,6 +30,7 @@ namespace AI.GameEngine
             var wellsMut = move.OldState.Wells.ToArray();
             resIntArrMut[x][y] = 0;
             var player = move.OldState.Player;
+            var anotherMove = false;
             while (stonesLeft > 0)
             {
                 x += goingRight ? 1 : -1;
@@ -37,7 +39,12 @@ namespace AI.GameEngine
                     case < 0:
                     {
                         if (player == 0)
+                        {
                             wellsMut[0]++;
+                            stonesLeft--;
+                            if (stonesLeft == 0)
+                                anotherMove = true;
+                        }
                         y = 1 - y;
                         goingRight = !goingRight;
                         break;
@@ -45,23 +52,28 @@ namespace AI.GameEngine
                     case > 5:
                     {
                         if (player == 1)
+                        {
                             wellsMut[1]++;
+                            stonesLeft--;
+                            if (stonesLeft == 0)
+                                anotherMove = true;
+                        }
                         y = 1 - y;
                         goingRight = !goingRight;
                         break;
                     }
                     default:
                         resIntArrMut[x][y]++;
+                        stonesLeft--;
                         break;
                 }
-                stonesLeft--;
             }
 
             return new State
             {
                 HolesState = resIntArrMut.Select(s => s.ToImmutableArray()).ToImmutableArray(),
                 Wells = wellsMut.ToImmutableArray(),
-                Player = 1-move.OldState.Player
+                Player = anotherMove ? move.OldState.Player : 1-move.OldState.Player
             };
         }
     }

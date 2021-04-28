@@ -3,7 +3,7 @@
         xmlns:vm="using:AI.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
         x:Class="AI.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="AI">
@@ -12,7 +12,17 @@
         <vm:MankalaViewModel />
     </Design.DataContext>
 
-    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ColumnDefinitions="4*, 1*, 1*, 1*, 1*, 1*, 1*, 4*" RowDefinitions="1*,1*">
+    <Window.Styles>
+        <Style Selector="Button.Enabled">
+            <Setter Property="IsEnabled" Value="True"></Setter>
+        </Style>
+        <Style Selector="Button.Disabled">
+            <Setter Property="IsEnabled" Value="False"></Setter>
+        </Style>
+    </Window.Styles>
+    
+    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ColumnDefinitions="2*, 1*, 1*, 1*, 1*, 1*, 1*, 2*" RowDefinitions="3*,3*,1*">
+        <TextBlock HorizontalAlignment="Center" TextAlignment="Center" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Text="{Binding State.Wells[0]}"></TextBlock>
         <Button Name="B1" Command="{Binding OnClickCommand}" CommandParameter="B1" Grid.Row="0" Grid.Column="1" Content="{Binding State.HolesState[0][0], Mode=OneWay}" />
         <Button Name="B2" Command="{Binding OnClickCommand}" CommandParameter="B2" Grid.Row="0" Grid.Column="2" Content="{Binding State.HolesState[1][0], Mode=OneWay}" />
         <Button Name="B3" Command="{Binding OnClickCommand}" CommandParameter="B3" Grid.Row="0" Grid.Column="3" Content="{Binding State.HolesState[2][0], Mode=OneWay}" />
@@ -25,6 +35,8 @@
         <Button Name="B10" Command="{Binding OnClickCommand}" CommandParameter="B10" Grid.Row="1" Grid.Column="4" Content="{Binding State.HolesState[3][1], Mode=OneWay}" />
         <Button Name="B11" Command="{Binding OnClickCommand}" CommandParameter="B11" Grid.Row="1" Grid.Column="5" Content="{Binding State.HolesState[4][1], Mode=OneWay}" />
         <Button Name="B12" Command="{Binding OnClickCommand}" CommandParameter="B12" Grid.Row="1" Grid.Column="6" Content="{Binding State.HolesState[5][1], Mode=OneWay}" />
+        <TextBlock HorizontalAlignment="Center" TextAlignment="Center" Grid.Row="0" Grid.Column="7" Grid.RowSpan="2" Text="{Binding State.Wells[1]}"></TextBlock>
+        <TextBlock Text="{Binding PlayerMoveString}"></TextBlock>
     </Grid>
 
 </Window>

@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reactive;
-using System.Text;
 using AI.Models;
-using AI.GameEngine;
-using Avalonia.Controls;
-using Avalonia.Interactivity;
 using ReactiveUI;
 
 namespace AI.ViewModels
@@ -16,22 +12,31 @@ namespace AI.ViewModels
     {
 
         private State _state;
-
+        private int _nInitialStones = 4;
+        public string PlayerMoveString => $"Kolej gracza {_state.Player + 1}";
+        public ReactiveCommand<string, Unit> OnClickCommand { get; }
         public State State
         {
             get => _state;
             set => _state = this.RaiseAndSetIfChanged(ref _state, value);
         }
+        
 
-        public ReactiveCommand<string, Unit> OnClickCommand { get; }
+
         public MankalaViewModel()
         {
-            State = new State
+            _state = new State
             {
-                HolesState = new int[6].Select(_ => new[] { 3, 3 }.ToImmutableArray()).ToImmutableArray(),
+                HolesState = new int[6].Select(_ => new[] { _nInitialStones, _nInitialStones }.ToImmutableArray()).ToImmutableArray(),
                 Wells = new[]{0,0}.ToImmutableArray()
             };
             OnClickCommand = ReactiveCommand.Create<string,Unit>(OnButtonClick);
+        }
+
+        //TODO: Implement sensibly
+        private void RefreshButtonState()
+        {
+
         }
 
         public Unit OnButtonClick(string buttonName)
@@ -63,8 +68,8 @@ namespace AI.ViewModels
 
             if (isValid)
                 State = GameEngine.GameEngine.MakeMove(move);
-
-
+            this.RaisePropertyChanged("PlayerMoveString");
+            RefreshButtonState();
             return new Unit();
         }
     }
