@@ -62,18 +62,18 @@ namespace AI.GameEngine
             return root;
         }
 
-        public static int DoMinMax(State state, int dieepte)
+        public static int? DoMinMax(State state, int dieepte, bool player1)
         {
-            static int MinMaxRec(Node node, int depth)
+            static int MinMaxRec(Node node, int depth, bool player1rec)
             {
                 if (depth == 0 || node.State.GameOver)
                     return Evaluate(node.State);
-                if (depth % 2 == 0)
+                if (!player1rec)
                 {
                     var value = int.MinValue;
                     node.Children.ForEach(child =>
                     {
-                        value = Math.Max(value, MinMaxRec(child, depth - 1));
+                        value = Math.Max(value, MinMaxRec(child, depth - 1, !player1rec));
                     });
                     node.Value = value;
                     return value;
@@ -83,7 +83,7 @@ namespace AI.GameEngine
                     var value = int.MaxValue;
                     node.Children.ForEach(child =>
                     {
-                        value = Math.Min(value, MinMaxRec(child, depth - 1));
+                        value = Math.Min(value, MinMaxRec(child, depth - 1,!player1rec));
                     });
                     node.Value = value;
                     return value;
@@ -91,9 +91,9 @@ namespace AI.GameEngine
             }
 
             var root = BuildTree(state, dieepte);
-            MinMaxRec(root, dieepte);
-            var bestChild = root.Children.OrderByDescending(child => child.Value).First();
-            return bestChild.Selection.Item1;
+            MinMaxRec(root, dieepte, player1);
+            var bestChild = root.Children.OrderByDescending(child => child.Value).FirstOrDefault();
+            return bestChild?.Selection.Item1;
         }
     }
 }

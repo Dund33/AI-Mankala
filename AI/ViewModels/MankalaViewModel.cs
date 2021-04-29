@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
+using System.Threading;
 using AI.GameEngine;
 using AI.Models;
 using ReactiveUI;
@@ -15,8 +16,8 @@ namespace AI.ViewModels
 
         private State _state;
         private int _nInitialStones = 4;
-        private int nextBotMove = 0;
-
+        private int? nextBotMove = 0;
+        private Timer timer;
         public string PlayerMoveString => $"Kolej gracza {_state.Player + 1}";
         public ReactiveCommand<string, Unit> OnClickCommand { get; }
         public State State
@@ -35,6 +36,7 @@ namespace AI.ViewModels
                 Wells = new[]{0,0}.ToImmutableArray()
             };
             OnClickCommand = ReactiveCommand.Create<string,Unit>(OnButtonClick);
+            timer = new Timer(_ => PlayRound(), null, 1000, 100);
         }
 
         //TODO: Implement sensibly
@@ -43,7 +45,7 @@ namespace AI.ViewModels
 
         }
 
-        public Unit OnButtonClick(string buttonName)
+        private void PlayRound()
         {
             if (State.GameOver)
             {
@@ -54,59 +56,43 @@ namespace AI.ViewModels
                     sum += State.HolesState[col][1];
                 }
 
-                return new Unit();
-
-            }
-            var choice = buttonName switch
-            {
-                "B1" => (0, 0),
-                "B2" => (1, 0),
-                "B3" => (2, 0),
-                "B4" => (3, 0),
-                "B5" => (4, 0),
-                "B6" => (5, 0),
-                "B7" => (0, 1),
-                "B8" => (1, 1),
-                "B9" => (2, 1),
-                "B10" => (3, 1),
-                "B11" => (4, 1),
-                "B12" => (5, 1),
-                _ => throw new NotImplementedException()
-            };
-
-            if (State.Player == 0)
-            {
-                nextBotMove = MinMax.DoMinMax(State, 6);
-                Debugger.Log(3, "Recursion", nextBotMove.ToString());
-                if (nextBotMove == -1)
-                {
-                    State.GameOver = true;
-                    return new Unit();
-                }
+                return;
             }
 
+            nextBotMove = MinMax.DoMinMax(State, 6,true);
+            Debugger.Log(3, "Recursion", nextBotMove.ToString());
+            if (nextBotMove == null)
+            {
+                State.GameOver = true;
+                timer.Dispose();
+                return;
+            }
             var move = new Move
             {
                 OldState = State,
-                Selection = choice
+                Selection = (nextBotMove.Value, 0)
             };
+            State = GameEngine.GameEngine.MakeMove(move);
 
-            var isValid = GameEngine.GameEngine.IsValidMove(move);
-
-            if (isValid)
-                State = GameEngine.GameEngine.MakeMove(move);
-            this.RaisePropertyChanged("PlayerMoveString");
-            RefreshButtonState();
-
+            nextBotMove = MinMax.DoMinMax(State, 6, false);
+            if (nextBotMove == null)
+            {
+                State.GameOver = true;
+                timer.Dispose();
+                return;
+            }
             move = new Move
             {
                 OldState = State,
-                Selection = (nextBotMove,1)
+                Selection = (nextBotMove.Value, 1)
             };
-
             State = GameEngine.GameEngine.MakeMove(move);
-            Debugger.Log(3, "Bot", "Bot Moved");
-            return new Unit();
+
+        }
+
+        public Unit OnButtonClick(string buttonName)
+        {
+            return new ();
         }
     }
 }
