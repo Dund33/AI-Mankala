@@ -95,12 +95,12 @@ namespace AI.GameEngine
 
             if (sum1 == 0)
             {
-                wellsMut[0] = sum2;
+                wellsMut[1] += sum2;
                 gameOver = true;
             }
             else if (sum2 == 0)
             {
-                wellsMut[1] = sum1;
+                wellsMut[0] += sum1;
                 gameOver = true;
             }
 

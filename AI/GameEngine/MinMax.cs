@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using AI.Models;
+using Avalonia.Layout;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AI.GameEngine
 {
@@ -11,7 +13,7 @@ namespace AI.GameEngine
         public List<Node>? Children { get; set; }
         public int Value { get; set; }
         public State State { get; set; }
-        public (int,int) Selection { get; set; }
+        public (int, int) Selection { get; set; }
     }
 
     internal record Tree(Node Root);
@@ -20,14 +22,14 @@ namespace AI.GameEngine
     {
         private static int Evaluate(State state)
         {
-            return state.Wells[0] - state.Wells[1];
+            return state.Wells[1] - state.Wells[0];
         }
 
-        public static int BuildTree(State state, int dieepte)
+        private static Node BuildTree(State state, int dieepte)
         {
-            List<Node> leaves = new List<Node>();
+            List<Node> leaves = new();
 
-            void GetLeaves(Node node, int depth, bool bot)
+            void BuildTreeRec(Node node, int depth, bool bot)
             {
                 if (depth == 0)
                 {
@@ -38,36 +40,60 @@ namespace AI.GameEngine
                 node.Children = new List<int> {0, 1, 2, 3, 4, 5}.Select(index =>
                     new Node
                     {
-                        State = GameEngine.MakeMove(new Move {OldState = node.State, Selection = bot ? (index, 1): (index, 0)}),
-                        Value = Evaluate(node.State),
+                        State = GameEngine.MakeMove(new Move
+                            {OldState = node.State, Selection = bot ? (index, 1) : (index, 0)}),
                         Selection = bot ? (index, 1) : (index, 0),
                         Parent = node
                     }
-                ).ToList();
-                node.Children.Where(n=> GameEngine.IsValidMove(node.State, n.Selection)).ToList().ForEach(n => GetLeaves(n, depth - 1, !bot));
+                ).Where(n => GameEngine.IsValidMove(node.State, n.Selection)).ToList();
+                node.Children.ToList()
+                    .ForEach(n => BuildTreeRec(n, depth - 1, !bot));
             }
 
 
-            var node = new Node()
+            var root = new Node
             {
                 Children = null,
                 Parent = null,
                 State = state,
-                Value = Evaluate(state)
             };
-            GetLeaves(node,dieepte, true);
+            BuildTreeRec(root, dieepte, true);
 
-            var max = leaves.OrderByDescending(leaf => leaf.Value).FirstOrDefault();
-            if (max == null)
-                return -1;
-            var result = new List<int>();
+            return root;
+        }
 
-            while (max.Parent.Parent != null)
+        public static int DoMinMax(State state, int dieepte)
+        {
+            static int MinMaxRec(Node node, int depth)
             {
-                max = max.Parent;
+                if (depth == 0 || node.State.GameOver)
+                    return Evaluate(node.State);
+                if (depth % 2 == 0)
+                {
+                    var value = int.MinValue;
+                    node.Children.ForEach(child =>
+                    {
+                        value = Math.Max(value, MinMaxRec(child, depth - 1));
+                    });
+                    node.Value = value;
+                    return value;
+                }
+                else
+                {
+                    var value = int.MaxValue;
+                    node.Children.ForEach(child =>
+                    {
+                        value = Math.Min(value, MinMaxRec(child, depth - 1));
+                    });
+                    node.Value = value;
+                    return value;
+                }
             }
 
-            return max.Selection.Item1;
+            var root = BuildTree(state, dieepte);
+            MinMaxRec(root, dieepte);
+            var bestChild = root.Children.OrderByDescending(child => child.Value).First();
+            return bestChild.Selection.Item1;
         }
     }
 }

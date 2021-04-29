@@ -76,10 +76,13 @@ namespace AI.ViewModels
 
             if (State.Player == 0)
             {
-                nextBotMove = MinMax.BuildTree(State, 4);
+                nextBotMove = MinMax.DoMinMax(State, 6);
                 Debugger.Log(3, "Recursion", nextBotMove.ToString());
                 if (nextBotMove == -1)
+                {
                     State.GameOver = true;
+                    return new Unit();
+                }
             }
 
             var move = new Move
