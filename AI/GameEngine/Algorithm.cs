@@ -19,6 +19,47 @@ namespace AI.GameEngine
         }
         internal record Tree(Node Root);
 
+        protected int Evaluate(State state)
+        {
+            return state.Wells[1] - state.Wells[0];
+        }
+
+        protected Node BuildTree(State state, int dieepte)
+        {
+            List<Node> leaves = new();
+
+            void BuildTreeRec(Node node, int depth, bool bot)
+            {
+                if (depth == 0)
+                {
+                    leaves.Add(node);
+                    return;
+                }
+
+                node.Children = new List<int> { 0, 1, 2, 3, 4, 5 }.Select(index =>
+                    new Node
+                    {
+                        State = GameEngine.MakeMove(new Move
+                            { OldState = node.State, Selection = bot ? (index, 1) : (index, 0) }),
+                        Selection = bot ? (index, 1) : (index, 0),
+                        Parent = node
+                    }
+                ).Where(n => GameEngine.IsValidMove(node.State, n.Selection)).ToList();
+                node.Children.ToList()
+                    .ForEach(n => BuildTreeRec(n, depth - 1, !bot));
+            }
+
+            var root = new Node
+            {
+                Children = null,
+                Parent = null,
+                State = state,
+            };
+            BuildTreeRec(root, dieepte, true);
+
+            return root;
+        }
+
         public abstract int? GetMove(State state, int depth, bool player1);
     }
 }
