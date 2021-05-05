@@ -15,18 +15,21 @@ namespace AI.ViewModels
     {
 
         private State _state;
-        private int _nInitialStones = 4;
-        private int? nextBotMove = 0;
-        private Timer timer;
+        const int _nInitialStones = 4;
+        private int? _nextBotMove = 0;
+        private Timer _timer;
+
         public string PlayerMoveString => $"Kolej gracza {_state.Player + 1}";
-        public ReactiveCommand<string, Unit> OnClickCommand { get; }
+        public ReactiveCommand<string, Unit> OnClickCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> OnClickStartCommand { get; }
+        public bool AivsAi { get; set; }
         public State State
         {
             get => _state;
             set => _state = this.RaiseAndSetIfChanged(ref _state, value);
         }
-        
 
+        private Algorithm _selectedAlgorithm;
 
         public MankalaViewModel()
         {
@@ -35,8 +38,7 @@ namespace AI.ViewModels
                 HolesState = new int[6].Select(_ => new[] { _nInitialStones, _nInitialStones }.ToImmutableArray()).ToImmutableArray(),
                 Wells = new[]{0,0}.ToImmutableArray()
             };
-            OnClickCommand = ReactiveCommand.Create<string,Unit>(OnButtonClick);
-            timer = new Timer(_ => PlayRound(), null, 1000, 100);
+            OnClickStartCommand = ReactiveCommand.Create<Unit, Unit>(StartButtonClick);
         }
 
         //TODO: Implement sensibly
@@ -45,7 +47,20 @@ namespace AI.ViewModels
 
         }
 
-        private void PlayRound()
+        public Unit StartButtonClick(Unit prop)
+        {
+            if (AivsAi)
+            {
+                _timer = new Timer(_ => PlayRoundAivsAi(), null, 1000, 100);
+            }
+            else
+            {
+                OnClickCommand = ReactiveCommand.Create<string, Unit>(OnButtonClick);
+            }
+            return new();
+        }
+
+        private void PlayRoundAivsAi()
         {
             if (State.GameOver)
             {
@@ -59,32 +74,32 @@ namespace AI.ViewModels
                 return;
             }
 
-            nextBotMove = MinMax.DoMinMax(State, 6,true);
-            Debugger.Log(3, "Recursion", nextBotMove.ToString());
-            if (nextBotMove == null)
+            _nextBotMove = _selectedAlgorithm.GetMove(State, 6,true);
+            Debugger.Log(3, "Recursion", _nextBotMove.ToString());
+            if (_nextBotMove == null)
             {
                 State.GameOver = true;
-                timer.Dispose();
+                _timer.Dispose();
                 return;
             }
             var move = new Move
             {
                 OldState = State,
-                Selection = (nextBotMove.Value, 0)
+                Selection = (_nextBotMove.Value, 0)
             };
             State = GameEngine.GameEngine.MakeMove(move);
 
-            nextBotMove = MinMax.DoMinMax(State, 6, false);
-            if (nextBotMove == null)
+            _nextBotMove = _selectedAlgorithm.GetMove(State, 6, false);
+            if (_nextBotMove == null)
             {
                 State.GameOver = true;
-                timer.Dispose();
+                _timer.Dispose();
                 return;
             }
             move = new Move
             {
                 OldState = State,
-                Selection = (nextBotMove.Value, 1)
+                Selection = (_nextBotMove.Value, 1)
             };
             State = GameEngine.GameEngine.MakeMove(move);
 

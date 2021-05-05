@@ -21,7 +21,7 @@
         </Style>
     </Window.Styles>
     
-    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ColumnDefinitions="2*, 1*, 1*, 1*, 1*, 1*, 1*, 2*" RowDefinitions="3*,3*,1*">
+    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ColumnDefinitions="2*, 1*, 1*, 1*, 1*, 1*, 1*, 2*" RowDefinitions="3*,3*,3*">
         <TextBlock HorizontalAlignment="Center" TextAlignment="Center" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Text="{Binding State.Wells[0]}"></TextBlock>
         <Button Name="B1" Command="{Binding OnClickCommand}" CommandParameter="B1" Grid.Row="0" Grid.Column="1" Content="{Binding State.HolesState[0][0], Mode=OneWay}" />
         <Button Name="B2" Command="{Binding OnClickCommand}" CommandParameter="B2" Grid.Row="0" Grid.Column="2" Content="{Binding State.HolesState[1][0], Mode=OneWay}" />
@@ -37,6 +37,11 @@
         <Button Name="B12" Command="{Binding OnClickCommand}" CommandParameter="B12" Grid.Row="1" Grid.Column="6" Content="{Binding State.HolesState[5][1], Mode=OneWay}" />
         <TextBlock HorizontalAlignment="Center" TextAlignment="Center" Grid.Row="0" Grid.Column="7" Grid.RowSpan="2" Text="{Binding State.Wells[1]}"></TextBlock>
         <TextBlock Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" Text="{Binding PlayerMoveString}"></TextBlock>
+        <ComboBox Name="ModeSelection" Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="2" HorizontalAlignment="Center">
+            <ComboBoxItem Content="AIvAI"></ComboBoxItem>
+            <ComboBoxItem Content="HumanvAi"></ComboBoxItem>
+        </ComboBox>
+        <Button Content="Start" Command="{Binding }"></Button>
     </Grid>
 
 </Window>

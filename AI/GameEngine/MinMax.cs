@@ -7,18 +7,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AI.GameEngine
 {
-    internal class Node
-    {
-        public Node? Parent { get; set; }
-        public List<Node>? Children { get; set; }
-        public int Value { get; set; }
-        public State State { get; set; }
-        public (int, int) Selection { get; set; }
-    }
-
-    internal record Tree(Node Root);
-
-    internal class MinMax
+    internal class MinMax: Algorithm
     {
         private static int Evaluate(State state)
         {
@@ -62,7 +51,7 @@ namespace AI.GameEngine
             return root;
         }
 
-        public static int? DoMinMax(State state, int dieepte, bool player1)
+        public override int? GetMove(State state, int dieepte, bool player1)
         {
             static int MinMaxRec(Node node, int depth, bool player1rec)
             {

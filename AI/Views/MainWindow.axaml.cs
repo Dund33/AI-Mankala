@@ -19,6 +19,19 @@ namespace AI.Views
             InitializeComponent();
 #if DEBUG
             this.AttachDevTools();
+
+            DataContextChanged += (obj, args) =>
+            {
+                var comboBox = this.Find<ComboBox>("ModeSelection");
+                if (comboBox == null)
+                    throw new NotImplementedException();
+                if (DataContext == null)
+                    throw new NotImplementedException();
+                comboBox.SelectionChanged += (sender, eventArgs) =>
+                {
+                    ((MankalaViewModel)DataContext).AivsAi = comboBox.SelectedItem as string == "AIvAI";
+                };
+            };
 #endif
         }
 
