@@ -27,7 +27,7 @@
         <Button HorizontalAlignment="Center" HorizontalContentAlignment="Center" Name="B11" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B11" Grid.Row="1" Grid.Column="5" Content="{Binding State.HolesState[4][1], Mode=OneWay}" />
         <Button HorizontalAlignment="Center" HorizontalContentAlignment="Center" Name="B12" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B12" Grid.Row="1" Grid.Column="6" Content="{Binding State.HolesState[5][1], Mode=OneWay}" />
         <TextBlock HorizontalAlignment="Stretch" TextAlignment="Center" Grid.Row="0" Grid.RowSpan="2" Grid.Column="7" Text="{Binding State.Wells[1]}" FontSize="42" Background="#4444"></TextBlock>
-        <TextBlock Grid.Column="2" Grid.ColumnSpan="3" Grid.Row="0" HorizontalAlignment="Stretch" Text="{Binding TopText}"></TextBlock>
+        <TextBlock Grid.Column="1" Grid.ColumnSpan="6" Grid.Row="0" TextAlignment="Center" HorizontalAlignment="Stretch" FontSize="16" Text="{Binding TopText}"></TextBlock>
         <ComboBox Name="ModeSelection" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" SelectedItem="AIvAI">
             <ComboBoxItem Content="AIvAI"></ComboBoxItem>
             <ComboBoxItem Content="HumanvAi"></ComboBoxItem>
