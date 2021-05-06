@@ -33,7 +33,7 @@ namespace AI.Views
                 comboBox.SelectionChanged += (sender, eventArgs) =>
                 {
                     Debugger.Log(3, "Button", comboBox.SelectedItem as string);
-                    ((MankalaViewModel)DataContext).AivsAi = ((ComboBoxItem)comboBox.SelectedItem).Content as string == "AIvAI";
+                    ((MankalaViewModel)DataContext).AivsAi = ((ComboBoxItem)comboBox.SelectedItem)?.Content as string == "AIvAI";
                 };
 
                 ((MankalaViewModel) DataContext).WhenAnyValue(x => x.AivsAi).Subscribe(x=>

@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
 using System.Threading;
+using AI.Algorithms;
 using AI.GameEngine;
 using AI.Models;
 using ReactiveUI;
@@ -15,10 +16,10 @@ namespace AI.ViewModels
         private State _state;
         private const int NInitialStones = 4;
         private int? _nextBotMove = 0;
-        private Timer _timer;
+        private Timer? _timer;
         private bool _aivsai;
         private bool _abSelected;
-
+        private Algorithm? _selectedAlgorithm;
         private bool _disableAllButtons = true;
 
         public bool DisableAllButtons
@@ -27,7 +28,7 @@ namespace AI.ViewModels
             set => this.RaiseAndSetIfChanged(ref _disableAllButtons, value);
         }
 
-        public string PlayerMoveString => $"Kolej gracza {_state.Player + 1}";
+        public string TopText { get; set; } = "Wybierz tryb i naciśnij start";
         public ReactiveCommand<string, Unit> OnClickCommand { get; set; }
         public ReactiveCommand<Unit, Unit> OnClickStartCommand { get; }
         public ReactiveCommand<bool, Unit> OnABSelected { get; }
@@ -44,7 +45,6 @@ namespace AI.ViewModels
             set => _state = this.RaiseAndSetIfChanged(ref _state, value);
         }
 
-        private Algorithm _selectedAlgorithm;
 
         public MankalaViewModel()
         {
@@ -70,6 +70,8 @@ namespace AI.ViewModels
 
         public Unit StartButtonClick(Unit prop)
         {
+            TopText = "";
+            this.RaisePropertyChanged("TopText");
             if (_abSelected)
                 _selectedAlgorithm = new ABCuts();
             else
@@ -84,15 +86,22 @@ namespace AI.ViewModels
 
         private void PlayRoundAivsAi()
         {
-            if (State.GameOver) return;
+            if (State.GameOver)
+            {
+                TopText = "Game Over";
+                this.RaisePropertyChanged("TopText");
+                return;
+            }
 
-            _nextBotMove = _selectedAlgorithm.GetMove(State, 6, true);
+            _nextBotMove = _selectedAlgorithm?.GetMove(State, 6, true);
             Debugger.Log(3, "Recursion", _nextBotMove.ToString());
             if (_nextBotMove == null)
             {
                 DisableAllButtons = true;
                 State.GameOver = true;
-                _timer.Dispose();
+                _timer?.Dispose();
+                TopText = "Game Over";
+                this.RaisePropertyChanged("TopText");
                 return;
             }
 
@@ -103,12 +112,14 @@ namespace AI.ViewModels
             };
             State = GameEngine.GameEngine.MakeMove(move);
 
-            _nextBotMove = _selectedAlgorithm.GetMove(State, 6, false);
+            _nextBotMove = _selectedAlgorithm?.GetMove(State, 6, false);
             if (_nextBotMove == null)
             {
                 DisableAllButtons = true;
                 State.GameOver = true;
-                _timer.Dispose();
+                _timer?.Dispose();
+                TopText = "Game Over";
+                this.RaisePropertyChanged("TopText");
                 return;
             }
 
@@ -149,7 +160,6 @@ namespace AI.ViewModels
 
             if (isValid)
                 State = GameEngine.GameEngine.MakeMove(move);
-            this.RaisePropertyChanged("PlayerMoveString");
             RefreshButtonState();
 
             if (State.GameOver)
@@ -158,7 +168,7 @@ namespace AI.ViewModels
                 return new Unit();
             }
 
-            _nextBotMove = _selectedAlgorithm.GetMove(State, 6, false);
+            _nextBotMove = _selectedAlgorithm?.GetMove(State, 6, false);
             if (_nextBotMove == null)
             {
                 DisableAllButtons = true;
@@ -174,9 +184,9 @@ namespace AI.ViewModels
             };
 
             State = GameEngine.GameEngine.MakeMove(move);
-
             if (!State.GameOver) return new Unit();
-
+            TopText = "Game Over";
+            this.RaisePropertyChanged("TopText");
             DisableAllButtons = true;
             return new Unit();
         }

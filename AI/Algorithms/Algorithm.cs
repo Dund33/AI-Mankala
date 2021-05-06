@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AI.Models;
+using AI.GameEngine;
 
-namespace AI.GameEngine
+namespace AI.Algorithms
 {
     abstract class Algorithm
     {
@@ -14,7 +15,7 @@ namespace AI.GameEngine
             public Node? Parent { get; set; }
             public List<Node>? Children { get; set; }
             public int Value { get; set; }
-            public State State { get; set; }
+            public State? State { get; set; }
             public (int, int) Selection { get; set; }
         }
         internal record Tree(Node Root);
@@ -39,12 +40,12 @@ namespace AI.GameEngine
                 node.Children = new List<int> { 0, 1, 2, 3, 4, 5 }.Select(index =>
                     new Node
                     {
-                        State = GameEngine.MakeMove(new Move
+                        State = GameEngine.GameEngine.MakeMove(new Move
                             { OldState = node.State, Selection = bot ? (index, 1) : (index, 0) }),
                         Selection = bot ? (index, 1) : (index, 0),
                         Parent = node
                     }
-                ).Where(n => GameEngine.IsValidMove(node.State, n.Selection)).ToList();
+                ).Where(n => GameEngine.GameEngine.IsValidMove(node.State, n.Selection)).ToList();
                 node.Children.ToList()
                     .ForEach(n => BuildTreeRec(n, depth - 1, !bot));
             }

@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AI.GameEngine;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace AI.GameEngine
+namespace AI.Algorithms
 {
     class ABCuts : Algorithm
     {

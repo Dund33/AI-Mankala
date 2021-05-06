@@ -13,27 +13,27 @@
     </Design.DataContext>
     
     <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ColumnDefinitions="2*, 1*, 1*, 1*, 1*, 1*, 1*, 2*" RowDefinitions="3*,3*,1*,1*">
-        <TextBlock HorizontalAlignment="Center" TextAlignment="Center" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Text="{Binding State.Wells[0]}"></TextBlock>
-        <Button Name="B1" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B1" Grid.Row="0" Grid.Column="1" Content="{Binding State.HolesState[0][0], Mode=OneWay}" />
-        <Button Name="B2" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B2" Grid.Row="0" Grid.Column="2" Content="{Binding State.HolesState[1][0], Mode=OneWay}" />
-        <Button Name="B3" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B3" Grid.Row="0" Grid.Column="3" Content="{Binding State.HolesState[2][0], Mode=OneWay}" />
-        <Button Name="B4" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B4" Grid.Row="0" Grid.Column="4" Content="{Binding State.HolesState[3][0], Mode=OneWay}" />
-        <Button Name="B5" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B5" Grid.Row="0" Grid.Column="5" Content="{Binding State.HolesState[4][0], Mode=OneWay}" />
-        <Button Name="B6" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B6" Grid.Row="0" Grid.Column="6" Content="{Binding State.HolesState[5][0], Mode=OneWay}" />
-        <Button Name="B7" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B7" Grid.Row="1" Grid.Column="1" Content="{Binding State.HolesState[0][1], Mode=OneWay}" />
-        <Button Name="B8" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B8" Grid.Row="1" Grid.Column="2" Content="{Binding State.HolesState[1][1], Mode=OneWay}" />
-        <Button Name="B9" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B9" Grid.Row="1" Grid.Column="3" Content="{Binding State.HolesState[2][1], Mode=OneWay}" />
-        <Button Name="B10" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B10" Grid.Row="1" Grid.Column="4" Content="{Binding State.HolesState[3][1], Mode=OneWay}" />
-        <Button Name="B11" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B11" Grid.Row="1" Grid.Column="5" Content="{Binding State.HolesState[4][1], Mode=OneWay}" />
-        <Button Name="B12" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B12" Grid.Row="1" Grid.Column="6" Content="{Binding State.HolesState[5][1], Mode=OneWay}" />
-        <TextBlock HorizontalAlignment="Center" TextAlignment="Center" Grid.Row="0" Grid.Column="7" Grid.RowSpan="2" Text="{Binding State.Wells[1]}"></TextBlock>
-        <TextBlock Grid.Column="3" Grid.ColumnSpan="2" Grid.Row="0" Text="{Binding PlayerMoveString}"></TextBlock>
-        <ComboBox Name="ModeSelection" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" SelectedItem="AIvAI">
+        <TextBlock VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextTrimming="WordEllipsis" TextAlignment="Center"  Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Text="{Binding State.Wells[0]}" FontSize="42" Background="#4444"></TextBlock>
+        <Button HorizontalAlignment="Center" HorizontalContentAlignment="Center" Name="B1" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B1" Grid.Row="0" Grid.Column="1" Content="{Binding State.HolesState[0][0], Mode=OneWay}" />
+        <Button HorizontalAlignment="Center" HorizontalContentAlignment="Center" Name="B2" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B2" Grid.Row="0" Grid.Column="2" Content="{Binding State.HolesState[1][0], Mode=OneWay}" />
+        <Button HorizontalAlignment="Center" HorizontalContentAlignment="Center" Name="B3" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B3" Grid.Row="0" Grid.Column="3" Content="{Binding State.HolesState[2][0], Mode=OneWay}" />
+        <Button HorizontalAlignment="Center" HorizontalContentAlignment="Center" Name="B4" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B4" Grid.Row="0" Grid.Column="4" Content="{Binding State.HolesState[3][0], Mode=OneWay}" />
+        <Button HorizontalAlignment="Center" HorizontalContentAlignment="Center" Name="B5" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B5" Grid.Row="0" Grid.Column="5" Content="{Binding State.HolesState[4][0], Mode=OneWay}" />
+        <Button HorizontalAlignment="Center" HorizontalContentAlignment="Center" Name="B6" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B6" Grid.Row="0" Grid.Column="6" Content="{Binding State.HolesState[5][0], Mode=OneWay}" />
+        <Button HorizontalAlignment="Center" HorizontalContentAlignment="Center" Name="B7" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B7" Grid.Row="1" Grid.Column="1" Content="{Binding State.HolesState[0][1], Mode=OneWay}" />
+        <Button HorizontalAlignment="Center" HorizontalContentAlignment="Center" Name="B8" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B8" Grid.Row="1" Grid.Column="2" Content="{Binding State.HolesState[1][1], Mode=OneWay}" />
+        <Button HorizontalAlignment="Center" HorizontalContentAlignment="Center" Name="B9" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B9" Grid.Row="1" Grid.Column="3" Content="{Binding State.HolesState[2][1], Mode=OneWay}" />
+        <Button HorizontalAlignment="Center" HorizontalContentAlignment="Center" Name="B10" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B10" Grid.Row="1" Grid.Column="4" Content="{Binding State.HolesState[3][1], Mode=OneWay}" />
+        <Button HorizontalAlignment="Center" HorizontalContentAlignment="Center" Name="B11" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B11" Grid.Row="1" Grid.Column="5" Content="{Binding State.HolesState[4][1], Mode=OneWay}" />
+        <Button HorizontalAlignment="Center" HorizontalContentAlignment="Center" Name="B12" IsEnabled="False" Command="{Binding OnClickCommand}" CommandParameter="B12" Grid.Row="1" Grid.Column="6" Content="{Binding State.HolesState[5][1], Mode=OneWay}" />
+        <TextBlock HorizontalAlignment="Stretch" TextAlignment="Center" Grid.Row="0" Grid.RowSpan="2" Grid.Column="7" Text="{Binding State.Wells[1]}" FontSize="42" Background="#4444"></TextBlock>
+        <TextBlock Grid.Column="2" Grid.ColumnSpan="3" Grid.Row="0" HorizontalAlignment="Stretch" Text="{Binding TopText}"></TextBlock>
+        <ComboBox Name="ModeSelection" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" SelectedItem="AIvAI">
             <ComboBoxItem Content="AIvAI"></ComboBoxItem>
             <ComboBoxItem Content="HumanvAi"></ComboBoxItem>
         </ComboBox>
-        <ToggleButton Content="AB-cuts enabled" Name="B64" IsEnabled="True" Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="3" Command="{Binding OnABSelected}"></ToggleButton>
-        <Button Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" Content="Start" Command="{Binding OnClickStartCommand}"></Button>
+        <ToggleButton Content="AB-cuts enabled" Name="B64" IsEnabled="True" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Command="{Binding OnABSelected}" HorizontalAlignment="Stretch" Margin="0" HorizontalContentAlignment="Center"></ToggleButton>
+        <Button HorizontalAlignment="Center" Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" Content="Start" Command="{Binding OnClickStartCommand}"></Button>
     </Grid>
 
 </Window>

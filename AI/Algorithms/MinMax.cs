@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AI.GameEngine;
 using AI.Models;
 using Avalonia.Layout;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace AI.GameEngine
+namespace AI.Algorithms
 {
     internal class MinMax: Algorithm
     {
@@ -19,7 +20,7 @@ namespace AI.GameEngine
                 if (!player1rec)
                 {
                     var value = int.MinValue;
-                    node.Children.ForEach(child =>
+                    node.Children?.ForEach(child =>
                     {
                         value = Math.Max(value, MinMaxRec(child, depth - 1, !player1rec));
                     });
@@ -29,7 +30,7 @@ namespace AI.GameEngine
                 else
                 {
                     var value = int.MaxValue;
-                    node.Children.ForEach(child =>
+                    node.Children?.ForEach(child =>
                     {
                         value = Math.Min(value, MinMaxRec(child, depth - 1,!player1rec));
                     });
