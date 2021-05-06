@@ -93,7 +93,7 @@ namespace AI.ViewModels
                 return;
             }
 
-            _nextBotMove = _selectedAlgorithm?.GetMove(State, 6, true);
+            _nextBotMove = _selectedAlgorithm?.GetMove(State, 2, true);
             Debugger.Log(3, "Recursion", _nextBotMove.ToString());
             if (_nextBotMove == null)
             {
@@ -112,7 +112,7 @@ namespace AI.ViewModels
             };
             State = GameEngine.GameEngine.MakeMove(move);
 
-            _nextBotMove = _selectedAlgorithm?.GetMove(State, 6, false);
+            _nextBotMove = _selectedAlgorithm?.GetMove(State, 26, false);
             if (_nextBotMove == null)
             {
                 DisableAllButtons = true;
@@ -168,7 +168,7 @@ namespace AI.ViewModels
                 return new Unit();
             }
 
-            _nextBotMove = _selectedAlgorithm?.GetMove(State, 6, false);
+            _nextBotMove = _selectedAlgorithm?.GetMove(State, 2, false);
             if (_nextBotMove == null)
             {
                 DisableAllButtons = true;
