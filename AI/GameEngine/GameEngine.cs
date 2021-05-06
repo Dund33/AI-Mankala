@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AI.GameEngine
 {
-    class GameEngine
+    public class GameEngine
     {
         public static int HolesInRow { get; set; } = 6;
 

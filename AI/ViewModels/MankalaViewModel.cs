@@ -1,9 +1,10 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
+using System.Threading;
+using AI.Algorithms;
 using AI.GameEngine;
 using AI.Models;
 using ReactiveUI;
@@ -12,51 +13,126 @@ namespace AI.ViewModels
 {
     public class MankalaViewModel : ReactiveObject
     {
-
         private State _state;
-        private int _nInitialStones = 4;
-        private int nextBotMove = 0;
+        private const int NInitialStones = 4;
+        private int? _nextBotMove = 0;
+        private Timer? _timer;
+        private bool _aivsai;
+        private bool _abSelected;
+        private Algorithm? _selectedAlgorithm;
+        private bool _disableAllButtons = true;
 
-        public string PlayerMoveString => $"Kolej gracza {_state.Player + 1}";
-        public ReactiveCommand<string, Unit> OnClickCommand { get; }
+        public bool DisableAllButtons
+        {
+            get => _disableAllButtons;
+            set => this.RaiseAndSetIfChanged(ref _disableAllButtons, value);
+        }
+
+        public string TopText { get; set; } = "Wybierz tryb i naciśnij start";
+        public ReactiveCommand<string, Unit> OnClickCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> OnClickStartCommand { get; }
+        public ReactiveCommand<bool, Unit> OnABSelected { get; }
+
+        public bool AivsAi
+        {
+            get => _aivsai;
+            set => _aivsai = this.RaiseAndSetIfChanged(ref _aivsai, value);
+        }
+
         public State State
         {
             get => _state;
             set => _state = this.RaiseAndSetIfChanged(ref _state, value);
         }
-        
 
 
         public MankalaViewModel()
         {
             _state = new State
             {
-                HolesState = new int[6].Select(_ => new[] { _nInitialStones, _nInitialStones }.ToImmutableArray()).ToImmutableArray(),
-                Wells = new[]{0,0}.ToImmutableArray()
+                HolesState = new int[6].Select(_ => new[] {NInitialStones, NInitialStones}.ToImmutableArray())
+                    .ToImmutableArray(),
+                Wells = new[] {0, 0}.ToImmutableArray()
             };
-            OnClickCommand = ReactiveCommand.Create<string,Unit>(OnButtonClick);
+            OnClickStartCommand = ReactiveCommand.Create<Unit, Unit>(StartButtonClick);
+            OnClickCommand = ReactiveCommand.Create<string, Unit>(OnButtonClick);
+            OnABSelected = ReactiveCommand.Create<bool, Unit>(b =>
+            {
+                _abSelected = !_abSelected;
+                return new Unit();
+            });
         }
 
         //TODO: Implement sensibly
         private void RefreshButtonState()
         {
+        }
 
+        public Unit StartButtonClick(Unit prop)
+        {
+            TopText = "";
+            this.RaisePropertyChanged("TopText");
+            if (_abSelected)
+                _selectedAlgorithm = new ABCuts();
+            else
+                _selectedAlgorithm = new MinMax();
+            if (AivsAi)
+                _timer = new Timer(_ => PlayRoundAivsAi(), null, 1000, 750);
+            else
+                DisableAllButtons = false;
+            
+            return new Unit();
+        }
+
+        private void PlayRoundAivsAi()
+        {
+            if (State.GameOver)
+            {
+                TopText = "Game Over";
+                this.RaisePropertyChanged("TopText");
+                return;
+            }
+
+            _nextBotMove = _selectedAlgorithm?.GetMove(State, 2, true);
+            Debugger.Log(3, "Recursion", _nextBotMove.ToString());
+            if (_nextBotMove == null)
+            {
+                DisableAllButtons = true;
+                State.GameOver = true;
+                _timer?.Dispose();
+                TopText = "Game Over";
+                this.RaisePropertyChanged("TopText");
+                return;
+            }
+
+            var move = new Move
+            {
+                OldState = State,
+                Selection = (_nextBotMove.Value, 0)
+            };
+            State = GameEngine.GameEngine.MakeMove(move);
+
+            _nextBotMove = _selectedAlgorithm?.GetMove(State, 2, false);
+            if (_nextBotMove == null)
+            {
+                DisableAllButtons = true;
+                State.GameOver = true;
+                _timer?.Dispose();
+                TopText = "Game Over";
+                this.RaisePropertyChanged("TopText");
+                return;
+            }
+
+            move = new Move
+            {
+                OldState = State,
+                Selection = (_nextBotMove.Value, 1)
+            };
+            State = GameEngine.GameEngine.MakeMove(move);
         }
 
         public Unit OnButtonClick(string buttonName)
         {
-            if (State.GameOver)
-            {
-                var sum = 0;
-                for (var col = 0; col < 6; col++)
-                {
-                    sum += State.HolesState[col][0];
-                    sum += State.HolesState[col][1];
-                }
-
-                return new Unit();
-
-            }
             var choice = buttonName switch
             {
                 "B1" => (0, 0),
@@ -74,17 +150,6 @@ namespace AI.ViewModels
                 _ => throw new NotImplementedException()
             };
 
-            if (State.Player == 0)
-            {
-                nextBotMove = MinMax.DoMinMax(State, 6);
-                Debugger.Log(3, "Recursion", nextBotMove.ToString());
-                if (nextBotMove == -1)
-                {
-                    State.GameOver = true;
-                    return new Unit();
-                }
-            }
-
             var move = new Move
             {
                 OldState = State,
@@ -95,17 +160,34 @@ namespace AI.ViewModels
 
             if (isValid)
                 State = GameEngine.GameEngine.MakeMove(move);
-            this.RaisePropertyChanged("PlayerMoveString");
             RefreshButtonState();
+
+            if (State.GameOver)
+            {
+                DisableAllButtons = true;
+                return new Unit();
+            }
+
+            _nextBotMove = _selectedAlgorithm?.GetMove(State, 2, false);
+            if (_nextBotMove == null)
+            {
+                DisableAllButtons = true;
+                State.GameOver = true;
+                return new Unit();
+            }
+
 
             move = new Move
             {
                 OldState = State,
-                Selection = (nextBotMove,1)
+                Selection = (_nextBotMove.Value, 1)
             };
 
             State = GameEngine.GameEngine.MakeMove(move);
-            Debugger.Log(3, "Bot", "Bot Moved");
+            if (!State.GameOver) return new Unit();
+            TopText = "Game Over";
+            this.RaisePropertyChanged("TopText");
+            DisableAllButtons = true;
             return new Unit();
         }
     }

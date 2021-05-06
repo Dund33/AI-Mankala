@@ -9,7 +9,7 @@ namespace AI.Models
 {
     public class Move
     {
-        public State OldState { get; set; }
+        public State? OldState { get; set; }
         public (int,int) Selection { get; set; }
     }
 }
