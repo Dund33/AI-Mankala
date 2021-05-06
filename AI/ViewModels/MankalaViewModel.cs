@@ -77,7 +77,7 @@ namespace AI.ViewModels
             else
                 _selectedAlgorithm = new MinMax();
             if (AivsAi)
-                _timer = new Timer(_ => PlayRoundAivsAi(), null, 1000, 100);
+                _timer = new Timer(_ => PlayRoundAivsAi(), null, 1000, 750);
             else
                 DisableAllButtons = false;
             
@@ -112,7 +112,7 @@ namespace AI.ViewModels
             };
             State = GameEngine.GameEngine.MakeMove(move);
 
-            _nextBotMove = _selectedAlgorithm?.GetMove(State, 26, false);
+            _nextBotMove = _selectedAlgorithm?.GetMove(State, 2, false);
             if (_nextBotMove == null)
             {
                 DisableAllButtons = true;
