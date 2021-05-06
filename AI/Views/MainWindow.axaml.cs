@@ -33,23 +33,14 @@ namespace AI.Views
                 comboBox.SelectionChanged += (sender, eventArgs) =>
                 {
                     Debugger.Log(3, "Button", comboBox.SelectedItem as string);
-                    ((MankalaViewModel)DataContext).AivsAi = ((ComboBoxItem)comboBox.SelectedItem)?.Content as string == "AIvAI";
+                    ((MankalaViewModel)DataContext).AIvsAI = ((ComboBoxItem)comboBox.SelectedItem)?.Content as string == "AIvAI";
                 };
 
-                ((MankalaViewModel) DataContext).WhenAnyValue(x => x.AivsAi).Subscribe(x=>
+                ((MankalaViewModel)DataContext).WhenAnyValue(x => x.DisablePlayerButtons).Subscribe(x =>
                 {
                     this.GetVisualDescendants()
                         .OfType<Button>()
                         .Take(6)
-                        .ToList()
-                        .ForEach(button => button.IsEnabled = !x);
-                });
-
-                ((MankalaViewModel)DataContext).WhenAnyValue(x => x.DisableAllButtons).Subscribe(x =>
-                {
-                    this.GetVisualDescendants()
-                        .OfType<Button>()
-                        .Take(12)
                         .ToList()
                         .ForEach(button => button.IsEnabled = !x);
                 });

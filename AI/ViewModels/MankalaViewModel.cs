@@ -17,15 +17,15 @@ namespace AI.ViewModels
         private const int NInitialStones = 4;
         private int? _nextBotMove = 0;
         private Timer? _timer;
-        private bool _aivsai;
         private bool _abSelected;
         private Algorithm? _selectedAlgorithm;
-        private bool _disableAllButtons = true;
+        private bool _disablePlayerButtons = true;
 
-        public bool DisableAllButtons
+
+        public bool DisablePlayerButtons
         {
-            get => _disableAllButtons;
-            set => this.RaiseAndSetIfChanged(ref _disableAllButtons, value);
+            get => _disablePlayerButtons;
+            set => this.RaiseAndSetIfChanged(ref _disablePlayerButtons, value);
         }
 
         public string TopText { get; set; } = "Wybierz tryb i naciśnij start";
@@ -33,11 +33,7 @@ namespace AI.ViewModels
         public ReactiveCommand<Unit, Unit> OnClickStartCommand { get; }
         public ReactiveCommand<bool, Unit> OnABSelected { get; }
 
-        public bool AivsAi
-        {
-            get => _aivsai;
-            set => _aivsai = this.RaiseAndSetIfChanged(ref _aivsai, value);
-        }
+        public bool AIvsAI { get; set; }
 
         public State State
         {
@@ -76,10 +72,10 @@ namespace AI.ViewModels
                 _selectedAlgorithm = new ABCuts();
             else
                 _selectedAlgorithm = new MinMax();
-            if (AivsAi)
+            if (AIvsAI)
                 _timer = new Timer(_ => PlayRoundAivsAi(), null, 1000, 750);
             else
-                DisableAllButtons = false;
+                DisablePlayerButtons = false;
             
             return new Unit();
         }
@@ -97,7 +93,7 @@ namespace AI.ViewModels
             Debugger.Log(3, "Recursion", _nextBotMove.ToString());
             if (_nextBotMove == null)
             {
-                DisableAllButtons = true;
+                DisablePlayerButtons = true;
                 State.GameOver = true;
                 _timer?.Dispose();
                 TopText = "Game Over";
@@ -115,7 +111,7 @@ namespace AI.ViewModels
             _nextBotMove = _selectedAlgorithm?.GetMove(State, 2, false);
             if (_nextBotMove == null)
             {
-                DisableAllButtons = true;
+                DisablePlayerButtons = true;
                 State.GameOver = true;
                 _timer?.Dispose();
                 TopText = "Game Over";
@@ -164,14 +160,14 @@ namespace AI.ViewModels
 
             if (State.GameOver)
             {
-                DisableAllButtons = true;
+                DisablePlayerButtons = true;
                 return new Unit();
             }
 
             _nextBotMove = _selectedAlgorithm?.GetMove(State, 2, false);
             if (_nextBotMove == null)
             {
-                DisableAllButtons = true;
+                DisablePlayerButtons = true;
                 State.GameOver = true;
                 return new Unit();
             }
@@ -187,7 +183,7 @@ namespace AI.ViewModels
             if (!State.GameOver) return new Unit();
             TopText = "Game Over";
             this.RaisePropertyChanged("TopText");
-            DisableAllButtons = true;
+            DisablePlayerButtons = true;
             return new Unit();
         }
     }
