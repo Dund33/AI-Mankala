@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
@@ -20,7 +21,9 @@ namespace AI.ViewModels
         private bool _abSelected;
         private Algorithm? _selectedAlgorithm;
         private bool _disablePlayerButtons = true;
-
+        private List<long> _moveTimesPlayer1 = new();
+        private List<long> _moveTimesPlayer2 = new();
+        private int _moves = 0;
 
         public bool DisablePlayerButtons
         {
@@ -73,7 +76,7 @@ namespace AI.ViewModels
             else
                 _selectedAlgorithm = new MinMax();
             if (AIvsAI)
-                _timer = new Timer(_ => PlayRoundAivsAi(), null, 1000, 750);
+                _timer = new Timer(_ => PlayRoundAivsAi(), null, 1000, 3000);
             else
                 DisablePlayerButtons = false;
             
@@ -82,22 +85,26 @@ namespace AI.ViewModels
 
         private void PlayRoundAivsAi()
         {
+            var stopwatch = new Stopwatch();
             if (State.GameOver)
             {
-                TopText = "Game Over";
+                var av1 = _moveTimesPlayer1.Average();
+                var av2 = _moveTimesPlayer2.Average();
+                var correctAv = State.Player == 0 ? av1 : av2;
+                TopText = $"Average move time {correctAv}";
                 this.RaisePropertyChanged("TopText");
+                Console.WriteLine(_moves);
                 return;
             }
-
-            _nextBotMove = _selectedAlgorithm?.GetMove(State, 2, true);
-            Debugger.Log(3, "Recursion", _nextBotMove.ToString());
+            
+            stopwatch.Start();
+            _nextBotMove = _selectedAlgorithm?.GetMove(State, 7, true);
+            stopwatch.Stop();
+            _moves++;
+            _moveTimesPlayer1.Add(stopwatch.ElapsedMilliseconds);
             if (_nextBotMove == null)
             {
-                DisablePlayerButtons = true;
-                State.GameOver = true;
-                _timer?.Dispose();
-                TopText = "Game Over";
-                this.RaisePropertyChanged("TopText");
+                GameOver(_moveTimesPlayer2.Average());
                 return;
             }
 
@@ -107,15 +114,14 @@ namespace AI.ViewModels
                 Selection = (_nextBotMove.Value, 0)
             };
             State = GameEngine.GameEngine.MakeMove(move);
-
-            _nextBotMove = _selectedAlgorithm?.GetMove(State, 2, false);
+            stopwatch.Reset();
+            stopwatch.Start();
+            _nextBotMove = _selectedAlgorithm?.GetMove(State, 7, false);
+            stopwatch.Stop();
+            _moveTimesPlayer2.Add(stopwatch.ElapsedMilliseconds);
             if (_nextBotMove == null)
             {
-                DisablePlayerButtons = true;
-                State.GameOver = true;
-                _timer?.Dispose();
-                TopText = "Game Over";
-                this.RaisePropertyChanged("TopText");
+                GameOver(_moveTimesPlayer1.Average());
                 return;
             }
 
@@ -125,6 +131,15 @@ namespace AI.ViewModels
                 Selection = (_nextBotMove.Value, 1)
             };
             State = GameEngine.GameEngine.MakeMove(move);
+        }
+
+        private void GameOver(double moveTime)
+        {
+            DisablePlayerButtons = true;
+            State.GameOver = true;
+            _timer?.Dispose();
+            TopText = $"Average move time {moveTime}";
+            this.RaisePropertyChanged("TopText");
         }
 
         public Unit OnButtonClick(string buttonName)
