@@ -16,6 +16,7 @@ namespace AI.ViewModels
     {
         private State _state;
         private const int NInitialStones = 4;
+        private const int Depth = 7;
         private int? _nextBotMove = 0;
         private Timer? _timer;
         private bool _abSelected;
@@ -98,7 +99,7 @@ namespace AI.ViewModels
             }
             
             stopwatch.Start();
-            _nextBotMove = _selectedAlgorithm?.GetMove(State, 7, true);
+            _nextBotMove = _selectedAlgorithm?.GetMove(State, Depth, true);
             stopwatch.Stop();
             _moves++;
             _moveTimesPlayer1.Add(stopwatch.ElapsedMilliseconds);
@@ -116,7 +117,7 @@ namespace AI.ViewModels
             State = GameEngine.GameEngine.MakeMove(move);
             stopwatch.Reset();
             stopwatch.Start();
-            _nextBotMove = _selectedAlgorithm?.GetMove(State, 7, false);
+            _nextBotMove = _selectedAlgorithm?.GetMove(State, Depth, false);
             stopwatch.Stop();
             _moveTimesPlayer2.Add(stopwatch.ElapsedMilliseconds);
             if (_nextBotMove == null)
