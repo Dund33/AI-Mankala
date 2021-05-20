@@ -20,7 +20,7 @@ namespace AI.Algorithms
         }
         internal record Tree(Node Root);
 
-        protected int Evaluate(State state)
+        protected virtual int Evaluate(State state)
         {
             return state.Wells[1] - state.Wells[0];
         }

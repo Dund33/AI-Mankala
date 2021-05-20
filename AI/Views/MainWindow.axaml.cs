@@ -22,7 +22,7 @@ namespace AI.Views
             InitializeComponent();
 #if DEBUG
             this.AttachDevTools();
-
+#endif
             DataContextChanged += (obj, args) =>
             {
                 var comboBox = this.Find<ComboBox>("ModeSelection");
@@ -44,8 +44,17 @@ namespace AI.Views
                         .ToList()
                         .ForEach(button => button.IsEnabled = !x);
                 });
+
+                this.Find<TextBox>("Tb")
+                    .WhenValueChanged(x => x.Text).Subscribe(next =>
+                    {
+                        if (string.IsNullOrWhiteSpace(next)) return;
+
+                        if (int.TryParse(next, out var outInt))
+                            ((MankalaViewModel) DataContext).Depth = outInt;
+                    });
             };
-#endif
+
         }
 
         private void InitializeComponent()

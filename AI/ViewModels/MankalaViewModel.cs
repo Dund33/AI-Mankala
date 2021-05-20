@@ -16,10 +16,11 @@ namespace AI.ViewModels
     {
         private State _state;
         private const int NInitialStones = 4;
-        private const int Depth = 7;
+        public int Depth { get; set; } = 4;
         private int? _nextBotMove = 0;
         private Timer? _timer;
         private bool _abSelected;
+        private bool _heuristicEnabled;
         private Algorithm? _selectedAlgorithm;
         private bool _disablePlayerButtons = true;
         private List<long> _moveTimesPlayer1 = new();
@@ -36,6 +37,7 @@ namespace AI.ViewModels
         public ReactiveCommand<string, Unit> OnClickCommand { get; set; }
         public ReactiveCommand<Unit, Unit> OnClickStartCommand { get; }
         public ReactiveCommand<bool, Unit> OnABSelected { get; }
+        public ReactiveCommand<Unit,Unit> OnHeuristicSelected { get; set; }
 
         public bool AIvsAI { get; set; }
 
@@ -43,6 +45,12 @@ namespace AI.ViewModels
         {
             get => _state;
             set => _state = this.RaiseAndSetIfChanged(ref _state, value);
+        }
+
+        public int Moves
+        {
+            get => _moves;
+            set => _moves = this.RaiseAndSetIfChanged(ref _moves, value);
         }
 
 
@@ -61,6 +69,11 @@ namespace AI.ViewModels
                 _abSelected = !_abSelected;
                 return new Unit();
             });
+            OnHeuristicSelected = ReactiveCommand.Create<Unit,Unit>(b =>
+            {
+                _heuristicEnabled = !_heuristicEnabled;
+                return new Unit();
+            });
         }
 
         //TODO: Implement sensibly
@@ -73,11 +86,17 @@ namespace AI.ViewModels
             TopText = "";
             this.RaisePropertyChanged("TopText");
             if (_abSelected)
-                _selectedAlgorithm = new ABCuts();
+                if (_heuristicEnabled)
+                    _selectedAlgorithm = new ABCutsHeuristic();
+                else 
+                    _selectedAlgorithm = new ABCuts();
+            else if (_heuristicEnabled)
+                _selectedAlgorithm = new MinMaxHeuristic();
             else
                 _selectedAlgorithm = new MinMax();
+
             if (AIvsAI)
-                _timer = new Timer(_ => PlayRoundAivsAi(), null, 1000, 3000);
+                _timer = new Timer(_ => PlayRoundAivsAi(), null, 1000, 500);
             else
                 DisablePlayerButtons = false;
             
@@ -101,7 +120,7 @@ namespace AI.ViewModels
             stopwatch.Start();
             _nextBotMove = _selectedAlgorithm?.GetMove(State, Depth, true);
             stopwatch.Stop();
-            _moves++;
+            Moves++;
             _moveTimesPlayer1.Add(stopwatch.ElapsedMilliseconds);
             if (_nextBotMove == null)
             {
